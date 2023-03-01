@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <div class="container">
+    <a-row>
+      <a-col :span="10">
+        <a-auto-complete placeholder="Buscar país" option-label-prop="name" style="width: 100%" :options="suggestions" v-model:value="searchText"/>
+      </a-col>
+      <a-col :span="2">
+        <a-button type="primary" @click="handleSearch">Buscar</a-button>
+      </a-col>
+    </a-row>
     <a-table :columns="columns" :dataSource="countriesFormatted">
       <template #flag-column="{ text: flag }">
         <a-image :src="flag" :width="100"/>
@@ -20,16 +28,20 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import { Image, Modal, Table } from 'ant-design-vue';
+import { Image, Table, Button, Row, Col, Modal, AutoComplete } from 'ant-design-vue';
 
 export default {
   name: 'CountriesTable',
   components: {
     'a-table': Table,
+    'a-auto-complete': AutoComplete,
+    'a-button': Button,
     'a-image': Image,
-    'a-modal': Modal
+    'a-modal': Modal,
+    'a-row': Row,
+    'a-col': Col
   },
   setup() {
     const store = useStore();
@@ -93,7 +105,30 @@ export default {
       }
     })
 
+    const suggestions = computed(() => {
+      const countries = store.state.countries.suggestions;
+      if (!countries) {
+        return [];
+      }
+      
+      return countries.map((country) => ({ value: country.name.official }));
+    });
+
     const visible = ref(false);
+    const searchText = ref('');
+
+    const searchDelay = 1000;
+    let searchTimer = null;
+
+    watch(searchText, () => {
+      clearTimeout(searchTimer);
+
+      searchTimer = setTimeout(() => {
+        if (searchText.value.length > 2) {
+          store.dispatch('searchSuggestions', searchText.value);
+        }
+      }, searchDelay);
+    });
 
     const showModal = () => {
       visible.value = true;
@@ -101,6 +136,14 @@ export default {
 
     const handleOk = () => {
       visible.value = false;
+    };
+
+    const handleSearch = () => {
+      if (searchText.value === '') {
+        store.dispatch('fetchCountries', searchText.value);
+      } else {
+        store.dispatch('searchCountries', searchText.value);
+      }
     };
     
     const viewCountry = (code) => {
@@ -115,7 +158,17 @@ export default {
       viewCountry,
       visible,
       handleOk,
+      searchText,
+      handleSearch,
+      suggestions
     };
   },
 };
 </script>
+
+<style scoped>
+  .container {
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+</style>

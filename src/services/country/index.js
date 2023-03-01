@@ -6,7 +6,7 @@ class CountryService {
   }
 
   search(query) {
-      return HTTP.get('/search/' + query)
+      return HTTP.get(`/name/${query}`)
   }
   
   view(code) {
