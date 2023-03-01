@@ -47,10 +47,14 @@ export default {
         const countries = await CountryService.search(query);
         commit('setCountries', countries.data);
       } catch (error) {
-        notification.open({
-          message: 'Error',
-          description: `Ha ocurrido un error: ${error.message}`,
-        });
+        if (error.response?.data?.status != 404) {
+          notification.open({
+            message: 'Aviso',
+            description: `Ha ocurrido un error: ${error.message}`,
+          });
+        } else {
+          commit('setCountries', []);
+        }
       }
     },
     async searchSuggestions({ commit }, query) {
@@ -58,10 +62,14 @@ export default {
         const countries = await CountryService.search(query);
         commit('setSuggestions', countries.data);
       } catch (error) {
-        notification.open({
-          message: 'Error',
-          description: `Ha ocurrido un error: ${error.message}`,
-        });
+        if (error.response?.data?.status != 404) {
+          notification.open({
+            message: 'Aviso',
+            description: `Ha ocurrido un error: ${error.message}`,
+          });
+        } else {
+          commit('setSuggestions', []);
+        }
       }
     }
   },

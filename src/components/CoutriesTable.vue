@@ -4,7 +4,7 @@
       <a-image :src="flag" :width="100"/>
     </template>
     <template #actions="{ record }">
-      <a @click="viewCountry(record.code)">View</a>
+      <a @click="viewCountry(record.code)">Ver información</a>
     </template>
   </a-table>
   <a-modal v-model:visible="visible" title="Información" @ok="handleOk">
