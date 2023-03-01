@@ -1,4 +1,5 @@
 import CountryService from '@/services/country'
+import { notification } from 'ant-design-vue';
 
 export default {
   state: {
@@ -19,20 +20,49 @@ export default {
   },
   actions: {
     async fetchCountries({ commit }) {
-      const countries = await CountryService.all();
-      commit('setCountries', countries.data);
+      try {
+        const countries = await CountryService.all();
+        commit('setCountries', countries.data);
+      } catch (error) {
+        notification.open({
+          message: 'Error',
+          description: `Ha ocurrido un error: ${error.message}`,
+        });
+      }
     },
     async viewCountry({ commit }, countryCode) {
-      const country = await CountryService.view(countryCode);
-      commit('setCountry', country.data[0]);
+      try {
+        const country = await CountryService.view(countryCode);
+        commit('setCountry', country.data[0]);
+      } catch (error) {
+        notification.open({
+          message: 'Error',
+          description: `Ha ocurrido un error: ${error.message}`,
+        });
+      }
+      
     },
     async searchCountries({ commit }, query) {
-      const countries = await CountryService.search(query);
-      commit('setCountries', countries.data);
+      try {
+        const countries = await CountryService.search(query);
+        commit('setCountries', countries.data);
+      } catch (error) {
+        notification.open({
+          message: 'Error',
+          description: `Ha ocurrido un error: ${error.message}`,
+        });
+      }
     },
     async searchSuggestions({ commit }, query) {
-      const countries = await CountryService.search(query);
-      commit('setSuggestions', countries.data);
+      try {
+        const countries = await CountryService.search(query);
+        commit('setSuggestions', countries.data);
+      } catch (error) {
+        notification.open({
+          message: 'Error',
+          description: `Ha ocurrido un error: ${error.message}`,
+        });
+      }
     }
   },
 };
