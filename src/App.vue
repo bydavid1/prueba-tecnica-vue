@@ -8,19 +8,28 @@
         <a @click="viewCountry(record.code)">View</a>
       </template>
     </a-table>
+    <a-modal v-model:visible="visible" title="Información" @ok="handleOk">
+      <template v-if="countryDetail != null">
+        <a-image :src="countryDetail.flag" :width="150"/>
+        <h2>{{ countryDetail.name }}</h2>
+        <p>Codigo: {{ countryDetail.code }}.</p>
+        <p>Población: {{ countryDetail.population }}</p>
+      </template>
+    </a-modal>
   </div>
 </template>
 
 <script>
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
-import { Image, Table } from 'ant-design-vue';
+import { Image, Modal, Table } from 'ant-design-vue';
 
 export default {
   name: 'CountriesTable',
   components: {
     'a-table': Table,
     'a-image': Image,
+    'a-modal': Modal
   },
   setup() {
     const store = useStore();
@@ -53,6 +62,7 @@ export default {
       },
       {
         title: 'Acciones',
+        dataIndex: 'cioc',
         key: 'actions',
         slots: { customRender: 'actions' },
       },
@@ -66,17 +76,45 @@ export default {
         flag: country.flags.svg ,
         name: country.name.official,
         population: country.population,
+        code: country.ccn3
       }))
     })
+
+    const countryDetail = computed(() => {
+      const country = store.state.countries.country
+
+      if (country == null) return null;
+
+      return {
+        flag: country.flags.svg ,
+        name: country.name.official,
+        population: country.population,
+        code: country.cioc ?? country.cca3
+      }
+    })
+
+    const visible = ref(false);
+
+    const showModal = () => {
+      visible.value = true;
+    };
+
+    const handleOk = () => {
+      visible.value = false;
+    };
     
     const viewCountry = (code) => {
-      console.log(code);
+      store.dispatch('viewCountry', code);
+      showModal();
     };
     
     return {
       columns,
       countriesFormatted,
+      countryDetail,
       viewCountry,
+      visible,
+      handleOk,
     };
   },
 };

@@ -10,7 +10,7 @@ class CountryService {
   }
   
   view(code) {
-      return HTTP.get(`/country/` + code)
+      return HTTP.get(`/alpha/${code}`)
   }
 }
 
