@@ -1,9 +1,9 @@
 <template>
-  <a-row type="flex" justify="center">
-    <a-col :span="10">
+  <a-row type="flex" justify="center" :gutter="20">
+    <a-col :sm="8" :lg="10">
       <a-auto-complete placeholder="Buscar país" option-label-prop="name" style="width: 100%" :options="suggestions" v-model:value="searchText"/>
     </a-col>
-    <a-col :span="2">
+    <a-col :sm="4" :lg="2">
       <a-button type="primary" @click="handleSearch">Buscar</a-button>
     </a-col>
   </a-row>

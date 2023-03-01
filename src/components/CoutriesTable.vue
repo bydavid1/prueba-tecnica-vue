@@ -1,5 +1,5 @@
 <template>
-  <a-table :columns="columns" :dataSource="countriesFormatted">
+  <a-table :columns="columns" :dataSource="countriesFormatted" style="margin-top: 20px;">
     <template #flag-column="{ text: flag }">
       <a-image :src="flag" :width="100"/>
     </template>
@@ -9,10 +9,23 @@
   </a-table>
   <a-modal v-model:visible="visible" title="Información" @ok="handleOk">
     <template v-if="countryDetail != null">
-      <a-image :src="countryDetail.flag" :width="150"/>
       <h2>{{ countryDetail.name }}</h2>
-      <p>Codigo: {{ countryDetail.code }}.</p>
-      <p>Población: {{ countryDetail.population }}</p>
+      <a-row :gutter="16">
+        <a-col :span="10">
+          <h4>Bandera</h4>
+          <a-image :src="countryDetail.flag" :width="150"/>
+        </a-col>
+        <a-col :span="14">
+          <h3>Información</h3>
+          <p><b>Nombre común:</b> {{ countryDetail.commonName }}.</p>
+          <p><b>Capital:</b> {{ countryDetail.capital }}.</p>
+          <p><b>Region:</b> {{ countryDetail.region }}.</p>
+          <p><b>Codigo:</b> {{ countryDetail.code }}.</p>
+          <p><b>Población:</b> {{ countryDetail.population }}</p>
+          <p><b>Area:</b> {{ countryDetail.area }}</p>
+          <p><b>Población:</b> {{ countryDetail.population }}</p>
+        </a-col>
+      </a-row>
     </template>
   </a-modal>
 </template>
@@ -20,7 +33,7 @@
 <script>
 import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
-import { Image, Table, Modal } from 'ant-design-vue';
+import { Image, Table, Modal, Row, Col } from 'ant-design-vue';
 
 export default {
   name: 'CountriesTable',
@@ -28,6 +41,8 @@ export default {
     'a-table': Table,
     'a-image': Image,
     'a-modal': Modal,
+    'a-row': Row,
+    'a-col': Col,
   },
   setup() {
     const store = useStore();
@@ -35,8 +50,8 @@ export default {
     const columns = [
       {
         title: 'Numero',
-        dataIndex: 'index',
-        key: 'index',
+        dataIndex: 'key',
+        key: 'key',
       },
       {
         title: 'Bandera',
@@ -66,7 +81,7 @@ export default {
       const countries = store.state.countries.countries
 
       return countries.map((country, index) => ({
-        key: index,
+        key: index + 1,
         flag: country.flags.svg ,
         name: country.name.official,
         population: country.population,
@@ -82,7 +97,11 @@ export default {
       return {
         flag: country.flags.svg ,
         name: country.name.official,
+        commonName: country.name.common,
+        capital: country.capital[0],
+        region: country.region,
         population: country.population,
+        area: country.area,
         code: country.cioc ?? country.cca3
       }
     })
