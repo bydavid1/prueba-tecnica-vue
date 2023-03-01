@@ -1,71 +1,83 @@
 <template>
-  <div class="container">
-    <h1>Búsqueda de resultados</h1>
-    <a-form :form="form" @submit="handleSubmit">
-      <a-form-item label="Buscar">
-        <a-input v-model="query" placeholder="Escriba su búsqueda aquí" />
-      </a-form-item>
-      <a-form-item>
-        <a-button type="primary" html-type="submit">Buscar</a-button>
-      </a-form-item>
-    </a-form>
-    <a-table :columns="columns" :dataSource="dataSource" />
+  <div>
+    <a-table :columns="columns" :dataSource="countriesFormatted">
+      <template #flag-column="{ text: flag }">
+        <a-image :src="flag" :width="100"/>
+      </template>
+      <template #actions="{ record }">
+        <a @click="viewCountry(record.code)">View</a>
+      </template>
+    </a-table>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
-import { Form, Input, Button, Table } from 'ant-design-vue';
+import { computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import { Image, Table } from 'ant-design-vue';
 
 export default {
+  name: 'CountriesTable',
   components: {
-    'a-form': Form,
-    'a-form-item': Form.Item,
-    'a-input': Input,
-    'a-button': Button,
     'a-table': Table,
+    'a-image': Image,
   },
   setup() {
-    const form = reactive({
-      query: '',
+    const store = useStore();
+    
+    onMounted(() => {
+      store.dispatch('fetchCountries');
     });
-
+    
     const columns = [
       {
         title: 'Numero',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'index',
+        key: 'index',
       },
       {
         title: 'Bandera',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'flag',
+        key: 'flag',
+        slots: { customRender: 'flag-column' },
       },
       {
         title: 'Nombre',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'name',
+        key: 'name',
       },
       {
         title: 'Poblacion',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'population',
+        key: 'population',
+      },
+      {
+        title: 'Acciones',
+        key: 'actions',
+        slots: { customRender: 'actions' },
       },
     ];
-    const dataSource = reactive([]);
+    
+    const countriesFormatted = computed(() => {
+      const countries = store.state.countries.countries
 
+      return countries.map((country, index) => ({
+        key: index,
+        flag: country.flags.svg ,
+        name: country.name.official,
+        population: country.population,
+      }))
+    })
+    
+    const viewCountry = (code) => {
+      console.log(code);
+    };
+    
     return {
-      form,
       columns,
-      dataSource
+      countriesFormatted,
+      viewCountry,
     };
   },
 };
 </script>
-
-<style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-</style>
